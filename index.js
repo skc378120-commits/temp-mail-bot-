@@ -1,8 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
-const fetch = require('node-fetch');
 
-// Render-এর এনভায়রনমেন্ট ভেরিয়েবল থেকে টোকেন নেওয়া হবে
 const TOKEN = process.env.TELEGRAM_TOKEN; 
 
 if (!TOKEN) {
