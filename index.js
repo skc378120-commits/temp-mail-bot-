@@ -52,16 +52,23 @@ bot.onText(/\/inbox/, async (msg) => {
     }
 
     try {
-        const response = await fetch(`https://www.1secmail.com/api/v1/?action=getMessages&login=${userData.username}&domain=${userData.domain}`);
+        const url = `https://www.1secmail.com/api/v1/?action=getMessages&login=${userData.username}&domain=${userData.domain}`;
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const messages = await response.json();
 
-        if (messages.length === 0) {
+        if (!Array.isArray(messages) || messages.length === 0) {
             bot.sendMessage(chatId, `📭 আপনার ইনবক্স খালি। কোনো নতুন মেইল আসেনি।`);
             return;
         }
 
         for (let mail of messages) {
-            const mailRes = await fetch(`https://www.1secmail.com/api/v1/?action=readMessage&login=${userData.username}&domain=${userData.domain}&id=${mail.id}`);
+            const mailUrl = `https://www.1secmail.com/api/v1/?action=readMessage&login=${userData.username}&domain=${userData.domain}&id=${mail.id}`;
+            const mailRes = await fetch(mailUrl);
             const mailData = await mailRes.json();
 
             bot.sendMessage(chatId, 
@@ -73,7 +80,7 @@ bot.onText(/\/inbox/, async (msg) => {
             );
         }
     } catch (err) {
-        console.error(err);
+        console.error("Inbox fetch error:", err);
         bot.sendMessage(chatId, `⚠️ মেইল চেক করতে গিয়ে সমস্যা হয়েছে। আবার চেষ্টা করুন।`);
     }
 });
